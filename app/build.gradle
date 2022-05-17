@@ -1,16 +1,16 @@
 plugins {
     id 'com.android.application'
-//    id 'org.jetbrains.kotlin.android'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+     id 'com.apollographql.apollo3' version "3.3.0"
 }
 
 android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.tomaszrykala.githubbrowser.compose"
+        applicationId packageId
         minSdk 24
         targetSdk 31
         versionCode 1
@@ -48,6 +48,10 @@ android {
     }
 }
 
+apollo {
+    packageName = packageId
+}
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -63,6 +67,12 @@ dependencies {
     implementation ("com.github.ihsanbal:LoggingInterceptor:3.1.0") {
         exclude group: 'org.json', module: 'json'
     }
+
+    // GraphQL
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.apollographql.apollo3:apollo-runtime:$graphql_version"
+//    implementation "com.apollographql.apollo3:apollo-android-support:$graphql_version"
+//    implementation("com.apollographql.apollo3:apollo-runtime:3.3.0")
 
     // --- Dagger / Hilt ---
     implementation "com.google.dagger:hilt-android:$hilt_version"

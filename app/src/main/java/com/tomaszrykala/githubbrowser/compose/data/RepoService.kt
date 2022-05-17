@@ -12,14 +12,14 @@ import retrofit2.http.Query
 private const val BASE_URL = ""
 private const val AUTH_TOKEN = ""
 
-interface ProductService {
-    @GET("products")
-    suspend fun getProducts(
+interface RepoService {
+    @GET("repos")
+    suspend fun getRepos(
         @Query("token") token: String = AUTH_TOKEN,
-    ): List<ProductDto>
+    ): List<RepoResultDto>
 
     companion object {
-        fun create(): ProductService {
+        fun create(): RepoService {
             val logger = LoggingInterceptor.Builder()
                 .setLevel(Level.BASIC)
                 .log(Platform.INFO)
@@ -36,7 +36,7 @@ interface ProductService {
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .build()
-                .create(ProductService::class.java)
+                .create(RepoService::class.java)
         }
     }
 }

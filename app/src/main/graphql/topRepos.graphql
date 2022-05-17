@@ -1,0 +1,13 @@
+query FindQuery($query: String!) {
+  search(first: 3, query: $query, type: REPOSITORY) {
+    nodes {
+      ... on Repository {
+        name
+        url
+        stargazers {
+          totalCount
+        }
+      }
+    }
+  }
+}

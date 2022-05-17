@@ -1,12 +1,13 @@
 buildscript {
     ext {
-//        compose_version = "1.0.1"
-//        kotlin_version = "1.5.30"
-        kotlin_version = "1.6.10"
-        compose_version = "1.1.1"
+        packageId = "com.tomaszrykala.githubbrowser.compose"
 
-        hilt_version = '2.40.1'
-        android_tools_version = '7.2.0'
+        android_tools_version = "7.2.0"
+        compose_version = "1.1.1"
+        hilt_version = "2.40.1"
+        kotlin_version = "1.6.10"
+        graphql_version = "3.3.0" // "2.5.6"
+        okhttp_version = "3.12.0"
     }
 
     repositories {
@@ -28,19 +29,7 @@ buildscript {
 plugins {
     id 'com.android.application' version "$android_tools_version" apply false
     id 'com.android.library' version "$android_tools_version" apply false
-//    id 'org.jetbrains.kotlin.android' version '1.5.21' apply false
 }
-
-//allprojects {
-//    repositories {
-//        google()
-//        mavenCentral()
-//
-//        maven {
-//            url "https://jitpack.io"
-//        }
-//    }
-//}
 
 task clean(type: Delete) {
     delete rootProject.buildDir
