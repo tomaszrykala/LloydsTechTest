@@ -3,7 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-     id 'com.apollographql.apollo3' version "3.3.0"
+    id 'com.apollographql.apollo3'
 }
 
 android {
@@ -50,6 +50,7 @@ android {
 
 apollo {
     packageName = packageId
+    customTypeMapping = ["URI": "java.lang.String"]
 }
 
 dependencies {
@@ -61,18 +62,13 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation 'androidx.activity:activity-compose:1.4.0'
 
-    // --- Retrofit ---
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-moshi:2.4.0"
-    implementation ("com.github.ihsanbal:LoggingInterceptor:3.1.0") {
-        exclude group: 'org.json', module: 'json'
-    }
-
     // GraphQL
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.apollographql.apollo3:apollo-runtime:$graphql_version"
-//    implementation "com.apollographql.apollo3:apollo-android-support:$graphql_version"
-//    implementation("com.apollographql.apollo3:apollo-runtime:3.3.0")
+
+    // Chucker
+    debugImplementation "com.github.chuckerteam.chucker:library:$chucker_version"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chucker_version"
 
     // --- Dagger / Hilt ---
     implementation "com.google.dagger:hilt-android:$hilt_version"

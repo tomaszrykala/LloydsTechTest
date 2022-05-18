@@ -3,7 +3,7 @@ package com.tomaszrykala.githubbrowser.compose.repository
 import androidx.annotation.WorkerThread
 import com.apollographql.apollo3.ApolloClient
 import com.tomaszrykala.githubbrowser.compose.FindQuery
-import com.tomaszrykala.githubbrowser.compose.data.RepoResultDto
+import com.tomaszrykala.githubbrowser.compose.dto.RepoResultDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -13,14 +13,14 @@ import javax.inject.Singleton
 class RepoRepository @Inject constructor(private val client: ApolloClient) {
 
     @WorkerThread
-    fun query(query: String = "google"): Flow<RepoResultDto> =
-        client.query(FindQuery(query = query))
+    fun queryFlow(query: String): Flow<RepoResultDto> =
+        client.query(FindQuery("user:$query sort:stars"))
             .toFlow()
             .map {
                 if (it.hasErrors()) {
                     RepoResultDto.Error(requireNotNull(it.errors).map { error -> error.message })
                 } else {
-                    RepoResultDto.Success(it.data)
+                    RepoResultDto.Success(it.dataAssertNoErrors)
                 }
             }
 }
