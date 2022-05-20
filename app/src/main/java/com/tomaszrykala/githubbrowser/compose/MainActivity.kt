@@ -1,35 +1,50 @@
 package com.tomaszrykala.githubbrowser.compose
 
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent.KEYCODE_ENTER
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
 import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.test.withTestContext
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,12 +53,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) = super.onCreate(savedInstanceState).also {
 
-        val repos: List<Repository> by viewModel.repositories
         val state: RepoState by viewModel.state
 
         setContent {
             GithubBrowserComposeTheme {
-                GithubBrowser(viewModel, repos, state)
+                GithubBrowser(viewModel, state)
             }
         }
     }
@@ -60,8 +74,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GithubBrowser(
     viewModel: IReposViewModel,
-    repos: List<Repository> = emptyList(),
-    state: RepoState = RepoState.OkState,
+    state: RepoState = RepoState.InitState,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -102,23 +115,65 @@ fun GithubBrowser(
                 ),
             )
 
-            LazyColumn(
-                modifier = Modifier.padding(8.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                items(repos) { repo ->
-                    Text(
-                        repo.name,
-                        // modifier = Modifier.padding(2.dp)
-                    )
+            if (state is RepoState.ReadyState) {
+                LazyColumn(
+                    modifier = Modifier.padding(8.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(state.repos) { repo ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Button(
+                                onClick = {
+                                    Log.d(TAG, "Open repo: ${repo.url}.")
+                                },
+                                modifier = Modifier
+//                                    .background(color = Color.LightGray)
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .fillMaxWidth()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        contentDescription = "Starred count",
+                                        modifier = Modifier.padding(2.dp)
+                                    )
+                                    Text(
+                                        repo.totalCount.toString() + " | ",
+                                        maxLines = 1,
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.padding(2.dp)
+                                    )
+                                    Text(
+                                        repo.name,
+                                        maxLines = 2,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier
+                                            .padding(2.dp)
+                                            .fillMaxHeight()
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             when (state) {
+                RepoState.InitState -> Unit
+                RepoState.LoadingState -> Unit // show loading
                 is RepoState.ErrorState -> Unit // show error
-                is RepoState.LoadingState -> Unit // show loading
-                is RepoState.OkState -> Unit // dismiss stuff
+                is RepoState.ReadyState -> Unit // dismiss stuff
             }
         }
     }
@@ -128,10 +183,15 @@ fun GithubBrowser(
 @Composable
 fun DefaultPreview() {
     GithubBrowserComposeTheme {
-        GithubBrowser(object : IReposViewModel {
-            override fun fetchRepos(search: String) = Unit
-            override fun onStart() = Unit
-            override fun onStop() = Unit
-        })
+        GithubBrowser(
+            viewModel = object : IReposViewModel {
+                override fun fetchRepos(search: String) = Unit
+                override fun onStart() = Unit
+                override fun onStop() = Unit
+            },
+            state = RepoState.ReadyState(
+                listOf(Repository(1234, "hello world", "www.google.com"))
+            )
+        )
     }
 }

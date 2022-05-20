@@ -5,3 +5,5 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class GithubBrowserApplication : Application()
+
+const val TAG = "GithubBrowserApplication"

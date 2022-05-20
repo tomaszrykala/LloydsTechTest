@@ -31,32 +31,32 @@ internal class ReposViewModel @Inject constructor(
     @MainScope private val mainScope: CoroutineScope,
 ) : ViewModel(), IReposViewModel {
 
-    private val _repositories = mutableStateOf<List<Repository>>(emptyList())
-    val repositories: State<List<Repository>> = _repositories
-
-    private val _state = mutableStateOf<RepoState>(RepoState.OkState)
+    private val _state = mutableStateOf<RepoState>(RepoState.InitState)
     val state: State<RepoState> = _state
 
     private var appScopeJob: Job? = null
     private var lastSearch: String? = null
 
     override fun fetchRepos(search: String) {
-        lastSearch = search
-        searchRepos(search)
+        if (search.isNotBlank()) {
+            lastSearch = search
+            searchRepos(search)
+        }
     }
 
     private fun searchRepos(search: String) {
         appScopeJob = appScope.launch {
-            Log.d("ReposViewModel", "CSQ GitHub repos : start $appScopeJob")
+            _state.value = RepoState.LoadingState
+            Log.d(TAG, "Repos load start: $appScopeJob")
+
             repoRepository.queryFlow(search)
                 .collectLatest { result ->
-                    Log.d("ReposViewModel", "CSQ GitHub result : $result")
+                    Log.d(TAG, "Repos result: $result")
 
                     if (result is RepoResultDto.Success) {
                         mapSuccess(result.data).let {
                             mainScope.launch {
-                                _repositories.value = it
-                                _state.value = RepoState.OkState
+                                _state.value = RepoState.ReadyState(it)
                             }
                         }
                     } else {

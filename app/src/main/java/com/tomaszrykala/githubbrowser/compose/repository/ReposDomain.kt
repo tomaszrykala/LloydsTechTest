@@ -5,7 +5,8 @@ data class Repository(
 )
 
 sealed class RepoState {
-    object OkState : RepoState()
+    object InitState : RepoState()
     object LoadingState : RepoState()
+    data class ReadyState(val repos: List<Repository>) : RepoState()
     data class ErrorState(val error: String) : RepoState()
 }
