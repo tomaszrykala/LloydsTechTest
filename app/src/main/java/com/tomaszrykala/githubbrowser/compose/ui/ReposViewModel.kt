@@ -1,5 +1,7 @@
 package com.tomaszrykala.githubbrowser.compose
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.State
@@ -11,6 +13,7 @@ import com.tomaszrykala.githubbrowser.compose.di.MainScope
 import com.tomaszrykala.githubbrowser.compose.repository.RepoRepository
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
+import com.tomaszrykala.githubbrowser.compose.ui.util.CustomTabsLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -20,6 +23,7 @@ import javax.inject.Inject
 
 interface IReposViewModel {
     fun fetchRepos(search: String)
+    fun openRepo(uri: Uri, context: Context)
     fun onStart()
     fun onStop()
 }
@@ -29,6 +33,7 @@ internal class ReposViewModel @Inject constructor(
     private val repoRepository: RepoRepository,
     @ApplicationScope private val appScope: CoroutineScope,
     @MainScope private val mainScope: CoroutineScope,
+    private val tabsLauncher: CustomTabsLauncher,
 ) : ViewModel(), IReposViewModel {
 
     private val _state = mutableStateOf<RepoState>(RepoState.InitState)
@@ -81,6 +86,8 @@ internal class ReposViewModel @Inject constructor(
             }
         }
     }
+
+    override fun openRepo(uri: Uri, context: Context) = tabsLauncher.launch(uri, context)
 
     @WorkerThread
     private fun mapSuccess(nodes: FindQuery.Data?): List<Repository> {
