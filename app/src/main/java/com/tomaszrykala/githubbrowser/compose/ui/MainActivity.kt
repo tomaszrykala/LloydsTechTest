@@ -11,19 +11,20 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +47,6 @@ class MainActivity : ComponentActivity() {
     private val viewModel: ReposViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) = super.onCreate(savedInstanceState).also {
-
         val state: RepoState by viewModel.state
 
         setContent {
@@ -74,10 +74,10 @@ fun GithubBrowser(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-
-        var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        var searchQuery by rememberSaveable(stateSaver = TextFieldValue.Saver) {
             mutableStateOf(TextFieldValue(""))
         }
+
         Column {
             Text(
                 text = "List GitHub Repositories",
@@ -86,10 +86,10 @@ fun GithubBrowser(
             )
 
             TextField(
-                value = text,
+                value = searchQuery,
                 singleLine = true,
                 onValueChange = { newValue ->
-                    text = newValue
+                    searchQuery = newValue
                         .copy(text = newValue.text.replace("\n", ""))
                 },
                 modifier = Modifier
@@ -97,7 +97,7 @@ fun GithubBrowser(
                     .fillMaxWidth()
                     .onKeyEvent {
                         if (it.nativeKeyEvent.keyCode == KEYCODE_ENTER) {
-                            viewModel.fetchRepos(text.text)
+                            viewModel.fetchRepos(searchQuery.text)
                         }
                         false
                     },
@@ -105,34 +105,61 @@ fun GithubBrowser(
                 placeholder = { Text("Search by name") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onDone = { viewModel.fetchRepos(text.text) }
+                    onDone = { viewModel.fetchRepos(searchQuery.text) }
                 ),
             )
 
-            if (state is RepoState.ReadyState) {
-                LazyColumn(
-                    modifier = Modifier.padding(8.dp),
-                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    items(state.repos) { repo ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            horizontalArrangement = Arrangement.Start,
-                        ) {
-                            ListItem(repo, viewModel)
-                        }
-                    }
-                }
-            }
-
             when (state) {
                 RepoState.InitState -> Unit
-                RepoState.LoadingState -> Unit // show loading
-                is RepoState.ErrorState -> Unit // show error
-                is RepoState.ReadyState -> Unit // dismiss stuff
+                RepoState.LoadingState -> ShowLoading()
+                is RepoState.ErrorState -> Unit // TODO Show Error
+                is RepoState.ReadyState -> ListRepos(state, viewModel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShowLoading() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.align(Center)) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(CenterHorizontally)
+            )
+            Text(
+                text = "Searching...",
+                style = typography.h6,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ListRepos(
+    state: RepoState.ReadyState,
+    viewModel: IReposViewModel
+) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.padding(8.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        items(state.repos) { repo ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                ListItem(repo, viewModel)
             }
         }
     }
@@ -193,9 +220,10 @@ fun DefaultPreview() {
                 override fun onStart() = Unit
                 override fun onStop() = Unit
             },
+            // state = RepoState.LoadingState,
             state = RepoState.ReadyState(
                 listOf(Repository(1234, "hello world", "www.google.com"))
-            )
+            ),
         )
     }
 }

@@ -6,6 +6,10 @@ plugins {
     id 'com.apollographql.apollo3'
 }
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     compileSdk 31
 
@@ -20,6 +24,8 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        buildConfigField("String", "AUTH_HEADER", apikeyProperties['AUTH_HEADER'])
     }
 
     buildTypes {

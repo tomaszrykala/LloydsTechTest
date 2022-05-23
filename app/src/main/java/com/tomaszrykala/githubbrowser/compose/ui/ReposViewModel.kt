@@ -2,22 +2,17 @@ package com.tomaszrykala.githubbrowser.compose
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
-import androidx.annotation.WorkerThread
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.tomaszrykala.githubbrowser.compose.dto.RepoResultDto
 import com.tomaszrykala.githubbrowser.compose.di.ApplicationScope
 import com.tomaszrykala.githubbrowser.compose.di.MainScope
-import com.tomaszrykala.githubbrowser.compose.repository.RepoRepository
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
-import com.tomaszrykala.githubbrowser.compose.repository.Repository
-import com.tomaszrykala.githubbrowser.compose.ui.util.CustomTabsLauncher
+import com.tomaszrykala.githubbrowser.compose.usecase.OpenRepoUseCase
+import com.tomaszrykala.githubbrowser.compose.usecase.SearchReposUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,10 +25,10 @@ interface IReposViewModel {
 
 @HiltViewModel
 internal class ReposViewModel @Inject constructor(
-    private val repoRepository: RepoRepository,
     @ApplicationScope private val appScope: CoroutineScope,
     @MainScope private val mainScope: CoroutineScope,
-    private val tabsLauncher: CustomTabsLauncher,
+    private val searchReposUseCase: SearchReposUseCase,
+    private val openRepoUseCase: OpenRepoUseCase,
 ) : ViewModel(), IReposViewModel {
 
     private val _state = mutableStateOf<RepoState>(RepoState.InitState)
@@ -52,25 +47,12 @@ internal class ReposViewModel @Inject constructor(
     private fun searchRepos(search: String) {
         appScopeJob = appScope.launch {
             _state.value = RepoState.LoadingState
-            Log.d(TAG, "Repos load start: $appScopeJob")
-
-            repoRepository.queryFlow(search)
-                .collectLatest { result ->
-                    Log.d(TAG, "Repos result: $result")
-
-                    if (result is RepoResultDto.Success) {
-                        mapSuccess(result.data).let {
-                            mainScope.launch {
-                                _state.value = RepoState.ReadyState(it)
-                            }
-                        }
-                    } else {
-                        mainScope.launch {
-                            _state.value = RepoState.ErrorState(result.toString())
-                        }
-                    }
+            searchReposUseCase.execute(search).let {
+                mainScope.launch {
+                    _state.value = it.getOrDefault(RepoState.InitState)
                     lastSearch = null
                 }
+            }
         }
     }
 
@@ -87,15 +69,5 @@ internal class ReposViewModel @Inject constructor(
         }
     }
 
-    override fun openRepo(uri: Uri, context: Context) = tabsLauncher.launch(uri, context)
-
-    @WorkerThread
-    private fun mapSuccess(nodes: FindQuery.Data?): List<Repository> {
-        return nodes?.search?.nodes
-            ?.filterNotNull()
-            ?.filter { it.onRepository is FindQuery.OnRepository }
-            ?.map { it.onRepository as FindQuery.OnRepository }
-            ?.map { Repository(it.stargazers.totalCount, it.name, it.url.toString()) }
-            ?: emptyList()
-    }
+    override fun openRepo(uri: Uri, context: Context) = openRepoUseCase.execute(uri, context)
 }

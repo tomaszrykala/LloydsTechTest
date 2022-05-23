@@ -4,6 +4,7 @@ import android.content.Context
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.network.okHttpClient
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.tomaszrykala.githubbrowser.compose.BuildConfig
 import com.tomaszrykala.githubbrowser.compose.repository.RepoRepository
 import dagger.Module
 import dagger.Provides
@@ -42,6 +43,5 @@ object SingletonModule {
 
     private const val serverUrl = "https://api.github.com/graphql"
     private const val authHeaderName = "Authorization"
-    private const val authHeaderValue =
-        "Bearer " + "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" // TODO ; expires 18/06/22
+    private const val authHeaderValue = "Bearer " + BuildConfig.AUTH_HEADER // expires 18/06/22
 }

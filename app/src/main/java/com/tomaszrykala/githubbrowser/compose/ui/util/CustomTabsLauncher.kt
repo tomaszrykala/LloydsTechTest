@@ -2,6 +2,7 @@ package com.tomaszrykala.githubbrowser.compose.ui.util
 
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.MainThread
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsIntent.COLOR_SCHEME_SYSTEM
 import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class CustomTabsLauncher @Inject constructor() {
 
+    @MainThread
     fun launch(uri: Uri, context: Context) {
         val intent = CustomTabsIntent.Builder()
             .setShareState(SHARE_STATE_ON)
