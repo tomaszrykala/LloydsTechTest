@@ -1,10 +1,12 @@
-package com.tomaszrykala.githubbrowser.compose
+package com.tomaszrykala.githubbrowser.compose.ui
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.tomaszrykala.githubbrowser.compose.TAG
 import com.tomaszrykala.githubbrowser.compose.di.ApplicationScope
 import com.tomaszrykala.githubbrowser.compose.di.MainScope
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
@@ -49,6 +51,7 @@ internal class ReposViewModel @Inject constructor(
             _state.value = RepoState.LoadingState
             searchReposUseCase.execute(search).let {
                 mainScope.launch {
+                    Log.d(TAG, "RepoState: $it")
                     _state.value = it.getOrDefault(RepoState.InitState)
                     lastSearch = null
                 }

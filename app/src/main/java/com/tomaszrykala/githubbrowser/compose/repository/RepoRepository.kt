@@ -4,8 +4,7 @@ import androidx.annotation.WorkerThread
 import com.apollographql.apollo3.ApolloClient
 import com.tomaszrykala.githubbrowser.compose.FindQuery
 import com.tomaszrykala.githubbrowser.compose.dto.RepoResultDto
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,5 +21,8 @@ class RepoRepository @Inject constructor(private val client: ApolloClient) {
                 } else {
                     RepoResultDto.Success(it.dataAssertNoErrors)
                 }
+            }
+            .catch {
+                emit(RepoResultDto.Error(listOf("An unknown error occurred. Check your connection.")))
             }
 }

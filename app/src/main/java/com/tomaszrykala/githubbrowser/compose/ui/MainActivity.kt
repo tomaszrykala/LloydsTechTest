@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,8 +32,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tomaszrykala.githubbrowser.compose.IReposViewModel
-import com.tomaszrykala.githubbrowser.compose.ReposViewModel
 import com.tomaszrykala.githubbrowser.compose.TAG
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository

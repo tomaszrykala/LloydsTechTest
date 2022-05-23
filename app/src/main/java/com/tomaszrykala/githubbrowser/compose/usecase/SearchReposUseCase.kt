@@ -7,7 +7,6 @@ import com.tomaszrykala.githubbrowser.compose.dto.RepoResultDto
 import com.tomaszrykala.githubbrowser.compose.repository.RepoRepository
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
-import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 class SearchReposUseCase @Inject constructor(
@@ -17,13 +16,16 @@ class SearchReposUseCase @Inject constructor(
     suspend fun execute(search: String): Result<RepoState> {
         var state: RepoState = RepoState.InitState
         return repoRepository.queryFlow(search)
-            .collectLatest { result ->
-                if (result is RepoResultDto.Success) {
-                    mapSuccess(result.data).let {
-                        state = RepoState.ReadyState(it)
+            .collect { result ->
+                when (result) {
+                    is RepoResultDto.Success -> {
+                        mapSuccess(result.data).let {
+                            state = RepoState.ReadyState(it)
+                        }
                     }
-                } else {
-                    state = RepoState.ErrorState(result.toString())
+                    is RepoResultDto.Error -> {
+                        state = RepoState.ErrorState(result.errors)
+                    }
                 }
             }
             .runCatching { state }
@@ -31,12 +33,12 @@ class SearchReposUseCase @Inject constructor(
 
     @WorkerThread
     @VisibleForTesting
-    internal fun mapSuccess(nodes: FindQuery.Data?): List<Repository> {
-        return nodes?.search?.nodes
+    internal fun mapSuccess(data: FindQuery.Data?): List<Repository> {
+        return data?.search?.nodes
             ?.filterNotNull()
             ?.filter { it.onRepository is FindQuery.OnRepository }
             ?.map { it.onRepository as FindQuery.OnRepository }
-            ?.map { Repository(it.stargazers.totalCount, it.name, it.url.toString()) }
+            ?.map { Repository(it.stargazers.totalCount, it.name, it.url) }
             ?: emptyList()
     }
 }
