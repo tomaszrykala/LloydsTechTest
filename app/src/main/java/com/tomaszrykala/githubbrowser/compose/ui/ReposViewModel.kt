@@ -18,20 +18,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-interface IReposViewModel {
-    fun fetchRepos(search: String)
-    fun openRepo(uri: Uri, context: Context)
-    fun onStart()
-    fun onStop()
-}
-
 @HiltViewModel
 internal class ReposViewModel @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
     @MainScope private val mainScope: CoroutineScope,
     private val searchReposUseCase: SearchReposUseCase,
     private val openRepoUseCase: OpenRepoUseCase,
-) : ViewModel(), IReposViewModel {
+) : ViewModel() {
 
     private val _state = mutableStateOf<RepoState>(RepoState.InitState)
     val state: State<RepoState> = _state
@@ -39,7 +32,7 @@ internal class ReposViewModel @Inject constructor(
     private var appScopeJob: Job? = null
     private var lastSearch: String? = null
 
-    override fun fetchRepos(search: String) {
+    fun fetchRepos(search: String) {
         if (search.isNotBlank()) {
             lastSearch = search
             searchRepos(search)
@@ -59,11 +52,11 @@ internal class ReposViewModel @Inject constructor(
         }
     }
 
-    override fun onStart() {
+    fun onStart() {
         lastSearch?.let { searchRepos(it) }
     }
 
-    override fun onStop() {
+    fun onStop() {
         appScopeJob?.let {
             if (it.isActive) {
                 it.cancel()
@@ -72,5 +65,5 @@ internal class ReposViewModel @Inject constructor(
         }
     }
 
-    override fun openRepo(uri: Uri, context: Context) = openRepoUseCase.execute(uri, context)
+    fun openRepo(uri: Uri, context: Context) = openRepoUseCase.execute(uri, context)
 }

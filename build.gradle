@@ -2,11 +2,12 @@ buildscript {
     ext {
         packageId = "com.tomaszrykala.githubbrowser.compose"
 
-        android_tools_version = "7.2.0"
-        compose_version = "1.1.1"
+        android_tools_version = '7.2.2'
+        compose_compiler_version = "1.1.1"
+        compose_version = "1.2.1"
         hilt_version = "2.40.1"
         kotlin_version = "1.6.10"
-        graphql_version = "3.3.0" // "2.5.6"
+        graphql_version = "3.3.0"
         okhttp_version = "3.12.0"
         chucker_version = "3.5.2"
     }
@@ -19,7 +20,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:$android_tools_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
-        classpath "com.apollographql.apollo3:apollo-gradle-plugin:3.3.0"
+        classpath "com.apollographql.apollo3:apollo-gradle-plugin:$graphql_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

@@ -11,12 +11,12 @@ def apikeyProperties = new Properties()
 apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         applicationId packageId
         minSdk 24
-        targetSdk 31
+        targetSdk 32
         versionCode 1
         versionName "1.0"
 
@@ -45,7 +45,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler_version
     }
     packagingOptions {
         resources {
@@ -61,13 +61,15 @@ apollo {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
-    implementation 'androidx.activity:activity-compose:1.4.0'
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.5.1'
     implementation 'androidx.browser:browser:1.4.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
 
     // GraphQL
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
@@ -81,12 +83,9 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
+    // --- Test ---
     testImplementation 'junit:junit:4.13.2'
     testImplementation "io.mockk:mockk:1.12.4"
     testImplementation "com.google.truth:truth:1.1.3"
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-//    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }
