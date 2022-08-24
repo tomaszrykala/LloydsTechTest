@@ -18,10 +18,8 @@ class SearchReposUseCase @Inject constructor(
         return repoRepository.queryFlow(search)
             .collect { result ->
                 when (result) {
-                    is RepoResultDto.Success -> {
-                        mapSuccess(result.data).let {
-                            state = RepoState.ReadyState(it)
-                        }
+                    is RepoResultDto.Success -> mapSuccess(result.data).let {
+                        state = RepoState.ReadyState(it)
                     }
                     is RepoResultDto.Error -> {
                         state = RepoState.ErrorState(result.errors)

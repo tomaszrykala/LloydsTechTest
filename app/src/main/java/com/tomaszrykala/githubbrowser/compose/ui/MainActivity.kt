@@ -34,16 +34,22 @@ class MainActivity : ComponentActivity(), RepoController {
         viewModel.onStop()
     }
 
-    override fun fetchRepos(search: String) {
-        viewModel.fetchRepos(search)
+    // save search term in instanceState?
+    override fun searchRepos(search: String) {
+        viewModel.searchRepos(search)
     }
 
     override fun openRepo(uri: Uri) {
         viewModel.openRepo(uri, this)
     }
+
+    override fun retrySearch() {
+        viewModel.retrySearch()
+    }
 }
 
 interface RepoController {
-    fun fetchRepos(search: String)
+    fun searchRepos(search: String)
     fun openRepo(uri: Uri)
+    fun retrySearch()
 }

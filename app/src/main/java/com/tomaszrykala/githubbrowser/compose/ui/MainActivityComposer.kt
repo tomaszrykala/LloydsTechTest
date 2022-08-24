@@ -1,7 +1,6 @@
 package com.tomaszrykala.githubbrowser.compose.ui
 
 import android.net.Uri
-import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.tomaszrykala.githubbrowser.compose.TAG
+import com.tomaszrykala.githubbrowser.compose.repository.DebugRepoStateFactory
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
 import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserComposeTheme
@@ -62,7 +61,7 @@ class MainActivityComposer {
                         .fillMaxWidth()
                         .onKeyEvent {
                             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                                controller.fetchRepos(searchQuery.text)
+                                controller.searchRepos(searchQuery.text)
                             }
                             false
                         },
@@ -70,16 +69,69 @@ class MainActivityComposer {
                     placeholder = { Text("Search by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
-                        onDone = { controller.fetchRepos(searchQuery.text) }
+                        onDone = { controller.searchRepos(searchQuery.text) }
                     ),
                 )
 
                 when (state) {
                     RepoState.InitState -> Unit
                     RepoState.LoadingState -> ShowLoading()
-                    is RepoState.ErrorState -> Unit // TODO Show Error
-                    is RepoState.ReadyState -> ListRepos(state, controller)
+                    is RepoState.ErrorState -> ShowError(state, controller)
+                    is RepoState.ReadyState -> {
+                        if (state.repos.isEmpty()) {
+                            ShowNoResults()
+                        } else {
+                            ShowResults(state, controller)
+                        }
+                    }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun ShowNoResults() {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.align(Alignment.Center)) {
+                Text(
+                    "No results!\nTry another org name.",
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.padding(8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun ShowError(state: RepoState.ErrorState, controller: RepoController) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.align(Alignment.Center)) {
+                Text(
+                    "Search failed!",
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally),
+                )
+                OutlinedButton(
+                    onClick = { controller.retrySearch() },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Retry")
+                }
+                Text(
+                    "Error(s):\n${state.errors.joinToString { "\n" + it }}",
+                    style = MaterialTheme.typography.subtitle2,
+                    modifier = Modifier
+                        .padding(48.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+                // Not the optimal way of displaying errors, but that's detail. The exceptions
+                // could be mapped to pre-baked, more meaningful to the user, messages.
             }
         }
     }
@@ -105,7 +157,7 @@ class MainActivityComposer {
     }
 
     @Composable
-    private fun ListRepos(state: RepoState.ReadyState, controller: RepoController) {
+    private fun ShowResults(state: RepoState.ReadyState, controller: RepoController) {
         val listState = rememberLazyListState()
 
         LazyColumn(
@@ -130,17 +182,14 @@ class MainActivityComposer {
     @Composable
     private fun ListItem(repo: Repository, controller: RepoController) {
         Button(
-            onClick = {
-                Log.d(TAG, "Open repo: ${repo.url}.")
-                controller.openRepo(Uri.parse(repo.url))
-            },
+            onClick = { controller.openRepo(Uri.parse(repo.url)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
         ) {
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Star,
@@ -150,13 +199,13 @@ class MainActivityComposer {
                 Text(
                     repo.totalCount.toString() + " | ",
                     maxLines = 1,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(2.dp)
+                    modifier = Modifier.padding(2.dp),
+                    style = MaterialTheme.typography.body1,
                 )
                 Text(
                     repo.name,
                     maxLines = 2,
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.body2,
                     modifier = Modifier
                         .padding(2.dp)
                         .fillMaxHeight()
@@ -171,12 +220,11 @@ class MainActivityComposer {
     fun DefaultPreview() {
         GithubBrowserComposeTheme {
             GithubBrowser(
-                state = RepoState.ReadyState(
-                    listOf(Repository(1234, "hello world", "www.google.com"))
-                ),
+                state = DebugRepoStateFactory.readyState,
                 controller = object : RepoController {
-                    override fun fetchRepos(search: String) = Unit
+                    override fun searchRepos(search: String) = Unit
                     override fun openRepo(uri: Uri) = Unit
+                    override fun retrySearch() = Unit
                 }
             )
         }

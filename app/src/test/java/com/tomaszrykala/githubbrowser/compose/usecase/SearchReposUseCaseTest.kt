@@ -100,7 +100,7 @@ class SearchReposUseCaseTest {
     }
 
     @Test
-    fun `GIVEN data has FindQuery_OnRepositorys WHEN mapSuccess THEN return mapped list`() {
+    fun `GIVEN data has FindQuery_OnRepositories WHEN mapSuccess THEN return mapped list`() {
         every { mockData.search } returns mockSearch
         val repoOne = FindQuery.OnRepository(
             name = "name", url = "url", FindQuery.Stargazers(1)

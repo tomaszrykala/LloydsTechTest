@@ -32,29 +32,31 @@ internal class ReposViewModel @Inject constructor(
     private var appScopeJob: Job? = null
     private var lastSearch: String? = null
 
-    fun fetchRepos(search: String) {
+    fun searchRepos(search: String) {
         if (search.isNotBlank()) {
             lastSearch = search
-            searchRepos(search)
+            search(search)
         }
     }
 
-    private fun searchRepos(search: String) {
+    private fun search(search: String) {
         appScopeJob = appScope.launch {
             _state.value = RepoState.LoadingState
-            searchReposUseCase.execute(search).let {
+            searchReposUseCase.execute(search).let { it ->
                 mainScope.launch {
                     Log.d(TAG, "RepoState: $it")
-                    _state.value = it.getOrDefault(RepoState.InitState)
-                    lastSearch = null
+                    it.getOrDefault(RepoState.InitState).let { state ->
+                        _state.value = state
+                        if (state !is RepoState.ErrorState) {
+                            lastSearch = null
+                        }
+                    }
                 }
             }
         }
     }
 
-    fun onStart() {
-        lastSearch?.let { searchRepos(it) }
-    }
+    fun onStart() = retrySearch()
 
     fun onStop() {
         appScopeJob?.let {
@@ -65,5 +67,12 @@ internal class ReposViewModel @Inject constructor(
         }
     }
 
-    fun openRepo(uri: Uri, context: Context) = openRepoUseCase.execute(uri, context)
+    fun retrySearch() {
+        lastSearch?.let { search(it) }
+    }
+
+    fun openRepo(uri: Uri, context: Context) {
+        Log.d(TAG, "Open repo: $uri.")
+        openRepoUseCase.execute(uri, context)
+    }
 }
