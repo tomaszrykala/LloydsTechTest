@@ -1,5 +1,5 @@
 query FindQuery($query: String!) {
-  search(first: 10, query: $query, type: REPOSITORY) {
+  search(first: 100, query: $query, type: REPOSITORY) {
     nodes {
       ... on Repository {
         name

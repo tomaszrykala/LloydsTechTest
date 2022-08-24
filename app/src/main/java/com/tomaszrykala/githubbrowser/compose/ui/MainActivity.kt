@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity(), RepoController {
         viewModel.onStop()
     }
 
-    // save search term in instanceState?
     override fun searchRepos(search: String) {
         viewModel.searchRepos(search)
     }

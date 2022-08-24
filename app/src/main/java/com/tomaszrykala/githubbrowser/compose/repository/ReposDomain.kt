@@ -11,7 +11,7 @@ sealed class RepoState {
     data class ErrorState(val errors: List<String>) : RepoState()
 }
 
-// Not the solution for a production app, for a showcase should be ok.
+// Not the solution for a production app, for a showcase should be ok. TODO debug srcSet ?
 internal object DebugRepoStateFactory {
     val readyState = RepoState.ReadyState(
         listOf(Repository(1234, "hello world", "www.google.com"))

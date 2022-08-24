@@ -27,7 +27,7 @@ class SearchReposUseCaseTest {
     @Test
     fun `GIVEN initial sub WHEN execute THEN return success InitState`() =
         runTest(UnconfinedTestDispatcher()) {
-            every { mockRepoRepository.queryFlow(search) } returns flow { Unit }
+            every { mockRepoRepository.queryFlow(search) } returns flow { }
 
             val result = sut.execute(search)
 

@@ -1,6 +1,7 @@
 package com.tomaszrykala.githubbrowser.compose.ui
 
 import android.net.Uri
+import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.tomaszrykala.githubbrowser.compose.TAG
 import com.tomaszrykala.githubbrowser.compose.repository.DebugRepoStateFactory
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
@@ -36,7 +38,8 @@ class MainActivityComposer {
     fun GithubBrowser(state: RepoState, controller: RepoController) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background
+            color = MaterialTheme.colors.background,
+            elevation = 8.dp,
         ) {
             var searchQuery by rememberSaveable(stateSaver = TextFieldValue.Saver) {
                 mutableStateOf(TextFieldValue(""))
@@ -73,6 +76,7 @@ class MainActivityComposer {
                     ),
                 )
 
+                Log.d(TAG, "RepoState: $state")
                 when (state) {
                     RepoState.InitState -> Unit
                     RepoState.LoadingState -> ShowLoading()
@@ -162,7 +166,7 @@ class MainActivityComposer {
 
         LazyColumn(
             state = listState,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
@@ -182,7 +186,11 @@ class MainActivityComposer {
     @Composable
     private fun ListItem(repo: Repository, controller: RepoController) {
         Button(
-            onClick = { controller.openRepo(Uri.parse(repo.url)) },
+            onClick = {
+                val uri = Uri.parse(repo.url)
+                Log.d(TAG, "Open repo: $uri.")
+                controller.openRepo(uri)
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
         ) {
