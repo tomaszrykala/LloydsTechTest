@@ -28,7 +28,6 @@ object CoroutineScopesModule {
         @MainDispatcher defaultDispatcher: CoroutineDispatcher
     ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
-//https://medium.com/androiddevelopers/create-an-application-coroutinescope-using-hilt-dd444e721528
 }
 
 @Retention(AnnotationRetention.RUNTIME)

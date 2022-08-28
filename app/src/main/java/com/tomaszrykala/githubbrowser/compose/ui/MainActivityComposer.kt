@@ -30,7 +30,8 @@ import com.tomaszrykala.githubbrowser.compose.TAG
 import com.tomaszrykala.githubbrowser.compose.repository.DebugRepoStateFactory
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
-import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserComposeTheme
+import com.tomaszrykala.githubbrowser.compose.ui.theme.LloydsTechTestTheme
+import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as Theme
 
 class MainActivityComposer {
 
@@ -49,7 +50,7 @@ class MainActivityComposer {
                 Text(
                     text = "List GitHub Repositories",
                     style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(Theme.dimens.spacingStandard)
                 )
 
                 TextField(
@@ -60,7 +61,7 @@ class MainActivityComposer {
                             .copy(text = newValue.text.replace("\n", ""))
                     },
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(Theme.dimens.spacingStandard)
                         .fillMaxWidth()
                         .onKeyEvent {
                             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -100,7 +101,7 @@ class MainActivityComposer {
                 Text(
                     "No results!\nTry another org name.",
                     style = MaterialTheme.typography.h5,
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(Theme.dimens.spacingStandard),
                     textAlign = TextAlign.Center
                 )
             }
@@ -115,14 +116,14 @@ class MainActivityComposer {
                     "Search failed!",
                     style = MaterialTheme.typography.h5,
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(Theme.dimens.spacingStandard)
                         .align(Alignment.CenterHorizontally),
                 )
                 OutlinedButton(
                     onClick = { controller.retrySearch() },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(Theme.dimens.spacingStandard)
                         .align(Alignment.CenterHorizontally)
                 ) {
                     Text("Retry")
@@ -131,7 +132,7 @@ class MainActivityComposer {
                     "Error(s):\n${state.errors.joinToString { "\n" + it }}",
                     style = MaterialTheme.typography.subtitle2,
                     modifier = Modifier
-                        .padding(48.dp)
+                        .padding(Theme.dimens.spacingSemiXXLarge)
                         .align(Alignment.CenterHorizontally)
                 )
                 // Not the optimal way of displaying errors, but that's detail. The exceptions
@@ -146,14 +147,14 @@ class MainActivityComposer {
             Column(modifier = Modifier.align(Alignment.Center)) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(Theme.dimens.spacingSemiXXLarge)
                         .align(Alignment.CenterHorizontally)
                 )
                 Text(
                     text = "Searching...",
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(Theme.dimens.spacingStandard)
                         .align(Alignment.CenterHorizontally)
                 )
             }
@@ -166,15 +167,21 @@ class MainActivityComposer {
 
         LazyColumn(
             state = listState,
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(
+                start = Theme.dimens.spacingStandard,
+                end = Theme.dimens.spacingStandard
+            ),
+            contentPadding = PaddingValues(
+                horizontal = Theme.dimens.spacingSmall,
+                vertical = Theme.dimens.spacingTiny
+            ),
+            verticalArrangement = Arrangement.spacedBy(Theme.dimens.spacingSmall),
         ) {
             items(state.repos) { repo ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp),
+                        .padding(Theme.dimens.spacingSmall),
                     horizontalArrangement = Arrangement.Start,
                 ) {
                     ListItem(repo, controller)
@@ -202,12 +209,12 @@ class MainActivityComposer {
                 Icon(
                     imageVector = Icons.Filled.Star,
                     contentDescription = "Starred count",
-                    modifier = Modifier.padding(2.dp)
+                    modifier = Modifier.padding(Theme.dimens.spacingTiny)
                 )
                 Text(
                     repo.totalCount.toString() + " | ",
                     maxLines = 1,
-                    modifier = Modifier.padding(2.dp),
+                    modifier = Modifier.padding(Theme.dimens.spacingTiny),
                     style = MaterialTheme.typography.body1,
                 )
                 Text(
@@ -215,7 +222,7 @@ class MainActivityComposer {
                     maxLines = 2,
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier
-                        .padding(2.dp)
+                        .padding(Theme.dimens.spacingTiny)
                         .fillMaxHeight()
                         .align(Alignment.CenterVertically)
                 )
@@ -226,7 +233,7 @@ class MainActivityComposer {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
-        GithubBrowserComposeTheme {
+        LloydsTechTestTheme {
             GithubBrowser(
                 state = DebugRepoStateFactory.readyState,
                 controller = object : RepoController {

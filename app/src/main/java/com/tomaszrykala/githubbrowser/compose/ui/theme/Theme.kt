@@ -5,6 +5,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 val primaryVariant = Purple700
 
@@ -29,8 +32,27 @@ private val LightColorPalette = lightColors(
     */
 )
 
+object GithubBrowserTheme {
+    val dimens: Dimens
+        @Composable
+        get() = Dimens()
+
+    @Immutable
+    data class Dimens(
+        val spacingTiny: Dp = 2.dp,
+        val spacingSmall: Dp = 4.dp,
+        val spacingStandard: Dp = 8.dp,
+        val spacingSemiLarge: Dp = 12.dp,
+        val spacingLarge: Dp = 16.dp,
+        val spacingSemiXLarge: Dp = 24.dp,
+        val spacingXLarge: Dp = 32.dp,
+        val spacingSemiXXLarge: Dp = 48.dp,
+        val spacingXXLarge: Dp = 64.dp,
+    )
+}
+
 @Composable
-fun GithubBrowserComposeTheme(
+fun LloydsTechTestTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

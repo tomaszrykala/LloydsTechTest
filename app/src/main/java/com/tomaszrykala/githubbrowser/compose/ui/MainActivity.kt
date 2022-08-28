@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
-import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserComposeTheme
+import com.tomaszrykala.githubbrowser.compose.ui.theme.LloydsTechTestTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity(), RepoController {
         val state: RepoState by viewModel.state
 
         setContent {
-            GithubBrowserComposeTheme {
+            LloydsTechTestTheme {
                 composer.GithubBrowser(state, this)
             }
         }
