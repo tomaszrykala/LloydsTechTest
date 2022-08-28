@@ -10,7 +10,6 @@ import com.tomaszrykala.githubbrowser.compose.testutil.mockkR
 import io.mockk.every
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -25,46 +24,43 @@ class SearchReposUseCaseTest {
     private val sut = SearchReposUseCase(mockRepoRepository)
 
     @Test
-    fun `GIVEN initial sub WHEN execute THEN return success InitState`() =
-        runTest(UnconfinedTestDispatcher()) {
-            every { mockRepoRepository.queryFlow(search) } returns flow { }
+    fun `GIVEN initial sub WHEN execute THEN return success InitState`() = runTest {
+        every { mockRepoRepository.queryFlow(search) } returns flow { }
 
-            val result = sut.execute(search)
+        val result = sut.execute(search)
 
-            assertThat(result).isEqualTo(Result.success(RepoState.InitState))
-        }
-
-    @Test
-    fun `GIVEN Repos are returned WHEN execute THEN return success ReadyState`() =
-        runTest(UnconfinedTestDispatcher()) {
-            every { mockData.search } returns mockSearch
-            val repoOne = FindQuery.OnRepository(
-                name = "name", url = "url", FindQuery.Stargazers(1)
-            )
-            val repo = Repository(repoOne.stargazers.totalCount, repoOne.name, repoOne.url)
-            every { mockSearch.nodes } returns listOf(FindQuery.Node("name", repoOne))
-
-            every { mockRepoRepository.queryFlow(search) } returns flow {
-                emit(RepoResultDto.Success(mockData))
-            }
-
-            val result = sut.execute(search)
-
-            assertThat(result).isEqualTo(Result.success(RepoState.ReadyState(listOf(repo))))
-        }
+        assertThat(result).isEqualTo(Result.success(RepoState.InitState))
+    }
 
     @Test
-    fun `GIVEN Error is returned WHEN execute THEN return success ErrorState`() =
-        runTest(UnconfinedTestDispatcher()) {
-            val errors = listOf("error 1", "error 2")
-            every { mockRepoRepository.queryFlow(search) } returns flow {
-                emit(RepoResultDto.Error(errors))
-            }
+    fun `GIVEN Repos are returned WHEN execute THEN return success ReadyState`() = runTest {
+        every { mockData.search } returns mockSearch
+        val repoOne = FindQuery.OnRepository(
+            name = "name", url = "url", FindQuery.Stargazers(1)
+        )
+        val repo = Repository(repoOne.stargazers.totalCount, repoOne.name, repoOne.url)
+        every { mockSearch.nodes } returns listOf(FindQuery.Node("name", repoOne))
 
-            val result = sut.execute(search)
-
-            assertThat(result).isEqualTo(Result.success(RepoState.ErrorState(errors)))
+        every { mockRepoRepository.queryFlow(search) } returns flow {
+            emit(RepoResultDto.Success(mockData))
         }
+
+        val result = sut.execute(search)
+
+        assertThat(result).isEqualTo(Result.success(RepoState.ReadyState(listOf(repo))))
+    }
+
+    @Test
+    fun `GIVEN Error is returned WHEN execute THEN return success ErrorState`() = runTest {
+        val errors = listOf("error 1", "error 2")
+        every { mockRepoRepository.queryFlow(search) } returns flow {
+            emit(RepoResultDto.Error(errors))
+        }
+
+        val result = sut.execute(search)
+
+        assertThat(result).isEqualTo(Result.success(RepoState.ErrorState(errors)))
+    }
 
     @Test
     fun `GIVEN data is null WHEN mapSuccess THEN return empty list`() {

@@ -9,9 +9,14 @@ import com.tomaszrykala.githubbrowser.compose.repository.Repository
 import com.tomaszrykala.githubbrowser.compose.testutil.mockkR
 import com.tomaszrykala.githubbrowser.compose.usecase.OpenRepoUseCase
 import com.tomaszrykala.githubbrowser.compose.usecase.SearchReposUseCase
-import io.mockk.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.test.*
+import io.mockk.Called
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.IOException
 
@@ -31,34 +36,32 @@ class ReposViewModelTest {
     )
 
     @Test
-    fun `GIVEN empty ReadyState is returned WHEN search THEN return it`() =
-        testScope.runTest {
-            val state = RepoState.ReadyState(emptyList())
-            coEvery { mockSearchReposUseCase.execute(search) } returns Result.success(state)
+    fun `GIVEN empty ReadyState is returned WHEN search THEN return it`() = testScope.runTest {
+        val state = RepoState.ReadyState(emptyList())
+        coEvery { mockSearchReposUseCase.execute(search) } returns Result.success(state)
 
-            sut.searchRepos(search)
-            advanceUntilIdle()
+        sut.searchRepos(search)
+        advanceUntilIdle()
 
-            coVerify { mockSearchReposUseCase.execute(search) }
-            assertThat(sut.state.value).isEqualTo(state)
-            assertThat(sut.lastSearch).isNull()
-        }
+        coVerify { mockSearchReposUseCase.execute(search) }
+        assertThat(sut.state.value).isEqualTo(state)
+        assertThat(sut.lastSearch).isNull()
+    }
 
     @Test
-    fun `GIVEN ReadyState is returned WHEN search THEN return it`() =
-        testScope.runTest {
-            val onRepo = FindQuery.OnRepository(name = "name", url = "url", FindQuery.Stargazers(1))
-            val repo = Repository(onRepo.stargazers.totalCount, onRepo.name, onRepo.url)
-            val state = RepoState.ReadyState(listOf(repo))
-            coEvery { mockSearchReposUseCase.execute(search) } returns Result.success(state)
+    fun `GIVEN ReadyState is returned WHEN search THEN return it`() = testScope.runTest {
+        val onRepo = FindQuery.OnRepository(name = "name", url = "url", FindQuery.Stargazers(1))
+        val repo = Repository(onRepo.stargazers.totalCount, onRepo.name, onRepo.url)
+        val state = RepoState.ReadyState(listOf(repo))
+        coEvery { mockSearchReposUseCase.execute(search) } returns Result.success(state)
 
-            sut.searchRepos(search)
-            advanceUntilIdle()
+        sut.searchRepos(search)
+        advanceUntilIdle()
 
-            coVerify { mockSearchReposUseCase.execute(search) }
-            assertThat(sut.state.value).isEqualTo(state)
-            assertThat(sut.lastSearch).isNull()
-        }
+        coVerify { mockSearchReposUseCase.execute(search) }
+        assertThat(sut.state.value).isEqualTo(state)
+        assertThat(sut.lastSearch).isNull()
+    }
 
     @Test
     fun `GIVEN ErrorState is returned WHEN search THEN return it and don't clear lastSearch`() =
@@ -87,23 +90,6 @@ class ReposViewModelTest {
             assertThat(sut.state.value).isEqualTo(RepoState.ErrorState(listOf(exception.message!!)))
             assertThat(sut.lastSearch).isEqualTo(search)
         }
-
-//    @Test
-//    fun `GIVEN job is active WHEN onStop THEN stop the job`() {
-//        val mockAppScope = mockkR<CoroutineScope>()
-//        every { mockAppScope.isActive } returns true
-//        val extraSut = ReposViewModel(
-//            appScope = mockAppScope,
-//            mainScope = TestScope(),
-//            mockSearchReposUseCase,
-//            mockOpenRepoUseCase
-//        )
-//
-//        extraSut.onStop()
-//
-//        verify { mockAppScope.isActive }
-//        verify { mockAppScope.cancel() }
-//    }
 
     @Test
     fun `GIVEN no previous search WHEN onStart THEN do nothing`() {
