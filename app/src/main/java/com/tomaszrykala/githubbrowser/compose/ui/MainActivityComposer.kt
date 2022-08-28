@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tomaszrykala.githubbrowser.compose.TAG
-import com.tomaszrykala.githubbrowser.compose.repository.DebugRepoStateFactory
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
 import com.tomaszrykala.githubbrowser.compose.ui.theme.LloydsTechTestTheme
@@ -235,7 +234,7 @@ class MainActivityComposer {
     fun DefaultPreview() {
         LloydsTechTestTheme {
             GithubBrowser(
-                state = DebugRepoStateFactory.readyState,
+                state = RepoState.InitState,
                 controller = object : RepoController {
                     override fun searchRepos(search: String) = Unit
                     override fun openRepo(uri: Uri) = Unit
