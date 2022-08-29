@@ -22,6 +22,7 @@ When a Config Change occurs while a network call is being made, that call is can
 After a call was completed, the call is not restarted, and the state is resumed.
 
 **The Sample requires an API Token** to be added for the search function to work. Instructions provided below.
+
 ____
 ### Use instructions
 1. Clone the repository and open in Android Studio
@@ -30,7 +31,10 @@ ____
 4. Launch the app.
 
 ____
+### Demo
+![Demo](githubbrowserdemo.gif)
 
+____
 ### Potential improvements
 
 I. Repeated searches for the same term are re-launched. To combat this the following could be added:
