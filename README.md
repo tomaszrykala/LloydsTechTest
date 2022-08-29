@@ -9,9 +9,9 @@ It's written in Kotlin, Flow, Jetpack Compose, and is using GitHub's GraphQL end
 ____
 ### Characteristics
 
-The Sample demostrates clear separation of concerns, by splitting Use Cases into dediccated classes, covered with Unit Tests.
+The Sample demonstrates clear separation of concerns, by splitting Use Cases into dedicated classes, covered with Unit Tests.
 
-It uses a Repository as its data source, which injected into the Use Case, publishing the data as a Kotlin Flow.
+It uses a Repository as its data source, which injected into the Use Case, publishes the data as a Kotlin Flow.
 
 The data becomes an Observable State, the changes in which the UI reacts to and recomposes, as needed.
 
@@ -19,9 +19,10 @@ Benefiting from the Android's ViewModel characteristic, the UI survives Configur
 
 When a Config Change occurs while a network call is being made, that call is cancelled and re-launched on start.
 
-After a call has been made, the call is not restarted, and the state is resumed.
+After a call was completed, the call is not restarted, and the state is resumed.
 
 **The Sample requires an API Token** to be added for the search function to work. Instructions provided below.
+
 ____
 ### Use instructions
 1. Clone the repository and open in Android Studio
@@ -30,7 +31,10 @@ ____
 4. Launch the app.
 
 ____
+### Demo
+![Demo](githubbrowserdemo.gif)
 
+____
 ### Potential improvements
 
 I. Repeated searches for the same term are re-launched. To combat this the following could be added:
