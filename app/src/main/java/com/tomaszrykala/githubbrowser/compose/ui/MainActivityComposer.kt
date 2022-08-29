@@ -1,5 +1,6 @@
 package com.tomaszrykala.githubbrowser.compose.ui
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import android.view.KeyEvent
@@ -34,60 +35,73 @@ import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as The
 
 class MainActivityComposer {
 
+
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun GithubBrowser(state: RepoState, controller: RepoController) {
-        Surface(
+        val scaffoldState = rememberScaffoldState()
+        Scaffold(
+            scaffoldState = scaffoldState,
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background,
-            elevation = 8.dp,
-        ) {
+            backgroundColor = MaterialTheme.colors.background,
+            topBar = { SearchBar(controller) },
+            content = { RepoList(state, controller) },
+        )
+    }
+
+    @Composable
+    private fun SearchBar(controller: RepoController) {
+        Column {
+            Text(
+                text = "List GitHub Repositories",
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier
+                    .padding(Theme.dimens.spacingStandard)
+                    .fillMaxWidth()
+            )
+
             var searchQuery by rememberSaveable(stateSaver = TextFieldValue.Saver) {
                 mutableStateOf(TextFieldValue(""))
             }
 
-            Column {
-                Text(
-                    text = "List GitHub Repositories",
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(Theme.dimens.spacingStandard)
-                )
-
-                TextField(
-                    value = searchQuery,
-                    singleLine = true,
-                    onValueChange = { newValue ->
-                        searchQuery = newValue
-                            .copy(text = newValue.text.replace("\n", ""))
-                    },
-                    modifier = Modifier
-                        .padding(Theme.dimens.spacingStandard)
-                        .fillMaxWidth()
-                        .onKeyEvent {
-                            if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                                controller.searchRepos(searchQuery.text)
-                            }
-                            false
-                        },
-                    label = { Text("Organisation") },
-                    placeholder = { Text("Search by name") },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = { controller.searchRepos(searchQuery.text) }
-                    ),
-                )
-
-                Log.d(TAG, "RepoState: $state")
-                when (state) {
-                    RepoState.InitState -> Unit
-                    RepoState.LoadingState -> ShowLoading()
-                    is RepoState.ErrorState -> ShowError(state, controller)
-                    is RepoState.ReadyState -> {
-                        if (state.repos.isEmpty()) {
-                            ShowNoResults()
-                        } else {
-                            ShowResults(state, controller)
+            TextField(
+                value = searchQuery,
+                singleLine = true,
+                onValueChange = { newValue ->
+                    searchQuery = newValue
+                        .copy(text = newValue.text.replace("\n", ""))
+                },
+                modifier = Modifier
+                    .padding(Theme.dimens.spacingStandard)
+                    .fillMaxWidth()
+                    .onKeyEvent {
+                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                            controller.searchRepos(searchQuery.text)
                         }
-                    }
+                        false
+                    },
+                label = { Text("Organisation") },
+                placeholder = { Text("Search by name") },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { controller.searchRepos(searchQuery.text) }
+                ),
+            )
+        }
+    }
+
+    @Composable
+    private fun RepoList(state: RepoState, controller: RepoController) {
+        Log.d(TAG, "RepoState: $state")
+        when (state) {
+            RepoState.InitState -> Unit
+            RepoState.LoadingState -> ShowLoading()
+            is RepoState.ErrorState -> ShowError(state, controller)
+            is RepoState.ReadyState -> {
+                if (state.repos.isEmpty()) {
+                    ShowNoResults()
+                } else {
+                    ShowResults(state, controller)
                 }
             }
         }

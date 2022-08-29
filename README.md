@@ -11,13 +11,13 @@ ____
 
 The Sample demostrates clear separation of concerns, by splitting Use Cases into dediccated classes, covered with Unit Tests.
 
-It uses a Repository as its data source, which injected into the Use Case, streams the data as a Kotlin Flow.
+It uses a Repository as its data source, which injected into the Use Case, publishing the data as a Kotlin Flow.
 
-The data becomes an observable State, the changes in which the UI reacts to, and recomposes as needed.
+The data becomes an Observable State, the changes in which the UI reacts to and recomposes, as needed.
 
-Benefitting from the Android's ViewModel characteristic, the UI survives Configuration Changes. 
+Benefiting from the Android's ViewModel characteristic, the UI survives Configuration Changes. 
 
-When a Config Change occures while a network call is being made, that call is cancelled and restarted on start. (?)
+When a Config Change occurs while a network call is being made, that call is cancelled and re-launched on start.
 
 After a call has been made, the call is not restarted, and the state is resumed.
 
@@ -26,7 +26,7 @@ ____
 ### Use instructions
 1. Clone the repository and open in Android Studio
 2. Generate a simple read-only Access Token, as described [HERE](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-3. Enter that token in *apikeys.properties* file.
+3. Enter that token in *apikeys.properties* file, as the value of a 'AUTH_HEADER'.
 4. Launch the app.
 
 ____

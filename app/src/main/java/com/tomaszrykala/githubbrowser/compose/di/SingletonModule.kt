@@ -43,5 +43,5 @@ object SingletonModule {
 
     private const val serverUrl = "https://api.github.com/graphql"
     private const val authHeaderName = "Authorization"
-    private const val authHeaderValue = "Bearer " + BuildConfig.AUTH_HEADER // expires 24/11/22
+    private const val authHeaderValue = "Bearer " + BuildConfig.AUTH_HEADER
 }
