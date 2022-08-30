@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.ui.theme.LloydsTechTestTheme
@@ -17,9 +18,8 @@ class MainActivity : ComponentActivity(), RepoController {
     private val composer = MainActivityComposer()
 
     override fun onCreate(savedInstanceState: Bundle?) = super.onCreate(savedInstanceState).also {
-        val state: RepoState by viewModel.state
-
         setContent {
+            val state: RepoState by viewModel.state.collectAsState()
             LloydsTechTestTheme {
                 composer.GithubBrowser(state, this)
             }

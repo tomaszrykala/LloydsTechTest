@@ -2,8 +2,6 @@ package com.tomaszrykala.githubbrowser.compose.ui
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.tomaszrykala.githubbrowser.compose.di.ApplicationScope
 import com.tomaszrykala.githubbrowser.compose.di.MainScope
@@ -13,6 +11,8 @@ import com.tomaszrykala.githubbrowser.compose.usecase.SearchReposUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,8 +24,8 @@ internal class ReposViewModel @Inject constructor(
     private val openRepoUseCase: OpenRepoUseCase,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf<RepoState>(RepoState.InitState)
-    val state: State<RepoState> = _state
+    private val _state = MutableStateFlow<RepoState>(RepoState.InitState)
+    val state: StateFlow<RepoState> = _state
 
     private var appScopeJob: Job? = null
     private var _lastSearch: String? = null
