@@ -27,7 +27,7 @@ class SearchReposUseCaseTest {
     fun `GIVEN initial sub WHEN execute THEN return success InitState`() = runTest {
         every { mockRepoRepository.queryFlow(search) } returns flow { }
 
-        val result = sut.execute(search)
+        val result = sut.invoke(search)
 
         assertThat(result).isEqualTo(Result.success(RepoState.InitState))
     }
@@ -45,7 +45,7 @@ class SearchReposUseCaseTest {
             emit(RepoResultDto.Success(mockData))
         }
 
-        val result = sut.execute(search)
+        val result = sut.invoke(search)
 
         assertThat(result).isEqualTo(Result.success(RepoState.ReadyState(listOf(repo))))
     }
@@ -57,7 +57,7 @@ class SearchReposUseCaseTest {
             emit(RepoResultDto.Error(errors))
         }
 
-        val result = sut.execute(search)
+        val result = sut.invoke(search)
 
         assertThat(result).isEqualTo(Result.success(RepoState.ErrorState(errors)))
     }

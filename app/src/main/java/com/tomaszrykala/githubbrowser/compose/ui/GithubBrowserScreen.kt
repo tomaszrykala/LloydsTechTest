@@ -1,20 +1,36 @@
 package com.tomaszrykala.githubbrowser.compose.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.view.KeyEvent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,11 +51,8 @@ import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
 import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as Theme
 
-//@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun GithubBrowser(
-//    state: RepoState,
-//    controller: RepoController
     viewModel: ReposViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -51,14 +64,7 @@ fun GithubBrowser(
         scaffoldState = scaffoldState,
         backgroundColor = MaterialTheme.colors.background,
         topBar = { SearchBar(viewModel::searchRepos) },
-//        content = {
-//            RepoList(
-//                state = state,
-//                onRetry = viewModel::retrySearch,
-//                onRepoSelected = viewModel::openRepo
-//            )
-//        },
-    )  { innerPadding ->
+    ) { innerPadding ->
         RepoList(
             modifier = Modifier.padding(innerPadding),
             state = state,
@@ -98,7 +104,6 @@ private fun SearchBar(
                 .fillMaxWidth()
                 .onKeyEvent {
                     if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                        // controller.searchRepos(searchQuery.text)
                         searchRepos(searchQuery.text)
                         focusManager.clearFocus()
                     }
@@ -109,7 +114,6 @@ private fun SearchBar(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    // controller.searchRepos(searchQuery.text)
                     searchRepos(searchQuery.text)
                     focusManager.clearFocus()
                 }
@@ -141,7 +145,7 @@ private fun RepoList(
 }
 
 @Composable
-private fun ShowNoResults(modifier: Modifier,) {
+private fun ShowNoResults(modifier: Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.align(Alignment.Center)) {
             Text(
@@ -253,7 +257,7 @@ private fun ListItem(
     Button(
         onClick = {
             val uri = Uri.parse(repo.url)
-            // controller.openRepo(uri, context)
+            Log.d(TAG, "Open repo: $uri.")
             onRepoSelected(uri, context)
         },
         modifier = Modifier.fillMaxWidth(),

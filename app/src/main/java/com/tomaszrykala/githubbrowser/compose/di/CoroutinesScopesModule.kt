@@ -10,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
+// TODO needed?
 @Module
 @InstallIn(SingletonComponent::class)
 object CoroutineScopesModule {

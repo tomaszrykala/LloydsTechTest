@@ -13,7 +13,7 @@ class SearchReposUseCase @Inject constructor(
     private val repoRepository: RepoRepository,
 ) {
 
-    suspend fun execute(search: String): Result<RepoState> {
+    suspend operator fun invoke(search: String): Result<RepoState> {
         var state: RepoState = RepoState.InitState
         return repoRepository.queryFlow(search)
             .collect { result ->
