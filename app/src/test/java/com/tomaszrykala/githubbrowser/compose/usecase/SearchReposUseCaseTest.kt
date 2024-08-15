@@ -29,7 +29,7 @@ class SearchReposUseCaseTest {
 
         val result = sut.invoke(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.InitState))
+        assertThat(result).isEqualTo(Result.success(RepoState.Init))
     }
 
     @Test
@@ -47,7 +47,7 @@ class SearchReposUseCaseTest {
 
         val result = sut.invoke(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.ReadyState(listOf(repo))))
+        assertThat(result).isEqualTo(Result.success(RepoState.Ready(listOf(repo))))
     }
 
     @Test
@@ -59,7 +59,7 @@ class SearchReposUseCaseTest {
 
         val result = sut.invoke(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.ErrorState(errors)))
+        assertThat(result).isEqualTo(Result.success(RepoState.Error(errors)))
     }
 
     @Test

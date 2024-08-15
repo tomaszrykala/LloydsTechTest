@@ -20,40 +20,40 @@ import javax.inject.Inject
 class ReposViewModel @Inject constructor(
     private val searchReposUseCase: SearchReposUseCase,
     private val openRepoUseCase: OpenRepoUseCase,
-) : ViewModel() {
+) : ViewModel(), GithubReposViewModel {
 
-    private val _state = MutableStateFlow<RepoState>(RepoState.InitState)
-    val state: StateFlow<RepoState> = _state
+    private val _state = MutableStateFlow<RepoState>(RepoState.Init)
+    override val state: StateFlow<RepoState> = _state
 
     @VisibleForTesting
     internal var lastSearch: String? = null
         private set
 
-    fun searchRepos(search: String) {
+    override fun searchRepos(search: String) {
         if (search.isNotBlank()) {
             lastSearch = search
             search(search)
         }
     }
 
-    fun retrySearch() {
+    override fun retrySearch() {
         lastSearch?.let { search(it) }
     }
 
-    fun openRepo(uri: Uri, context: Context) {
+    override fun openRepo(uri: Uri, context: Context) {
         openRepoUseCase.execute(uri, context)
     }
 
     private fun search(search: String) {
         viewModelScope.launch {
-            _state.value = RepoState.LoadingState
+            _state.value = RepoState.Loading
             withContext(Dispatchers.IO) {
                 searchReposUseCase(search).getOrElse {
-                    RepoState.ErrorState(listOf(it.message ?: "Unknown error."))
+                    RepoState.Error(listOf(it.message ?: "Unknown error."))
                 }.let { state ->
                     withContext(Dispatchers.Main) {
                         _state.value = state
-                        if (state !is RepoState.ErrorState) {
+                        if (state !is RepoState.Error) {
                             lastSearch = null
                         }
                     }
@@ -61,4 +61,11 @@ class ReposViewModel @Inject constructor(
             }
         }
     }
+}
+
+interface GithubReposViewModel {
+    val state: StateFlow<RepoState>
+    fun openRepo(uri: Uri, context: Context)
+    fun searchRepos(search: String)
+    fun retrySearch()
 }

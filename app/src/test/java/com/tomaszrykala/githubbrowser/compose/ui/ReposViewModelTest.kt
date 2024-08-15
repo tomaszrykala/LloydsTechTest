@@ -41,7 +41,7 @@ class ReposViewModelTest {
 
     @Test
     fun `GIVEN empty ReadyState is returned WHEN search THEN return it`() = runTest {
-        val state = RepoState.ReadyState(emptyList())
+        val state = RepoState.Ready(emptyList())
         coEvery { mockSearchReposUseCase(search) } returns Result.success(state)
 
         sut.searchRepos(search)
@@ -56,7 +56,7 @@ class ReposViewModelTest {
     fun `GIVEN ReadyState is returned WHEN search THEN return it`() = runTest {
         val onRepo = FindQuery.OnRepository(name = "name", url = "url", FindQuery.Stargazers(1))
         val repo = Repository(onRepo.stargazers.totalCount, onRepo.name, onRepo.url)
-        val state = RepoState.ReadyState(listOf(repo))
+        val state = RepoState.Ready(listOf(repo))
         coEvery { mockSearchReposUseCase(search) } returns Result.success(state)
 
         sut.searchRepos(search)
@@ -70,7 +70,7 @@ class ReposViewModelTest {
     @Test
     fun `GIVEN ErrorState is returned WHEN search THEN return it and don't clear lastSearch`() =
         runTest {
-            val state = RepoState.ErrorState(emptyList())
+            val state = RepoState.Error(emptyList())
             coEvery { mockSearchReposUseCase(search) } returns Result.success(state)
 
             sut.searchRepos(search)
@@ -91,7 +91,7 @@ class ReposViewModelTest {
             advanceUntilIdle()
 
             coVerify { mockSearchReposUseCase(search) }
-            assertThat(sut.state.value).isEqualTo(RepoState.ErrorState(listOf(exception.message!!)))
+            assertThat(sut.state.value).isEqualTo(RepoState.Error(listOf(exception.message!!)))
             assertThat(sut.lastSearch).isEqualTo(search)
         }
 

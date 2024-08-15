@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             LloydsTechTestTheme {
-                GithubBrowser(viewModel)
+                GithubBrowserScreen(viewModel)
             }
         }
     }

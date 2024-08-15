@@ -45,20 +45,24 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tomaszrykala.githubbrowser.compose.TAG
 import com.tomaszrykala.githubbrowser.compose.repository.RepoState
 import com.tomaszrykala.githubbrowser.compose.repository.Repository
+import com.tomaszrykala.githubbrowser.compose.ui.theme.LloydsTechTestTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as Theme
 
 @Composable
-fun GithubBrowser(
-    viewModel: ReposViewModel,
+fun GithubBrowserScreen(
+    viewModel: GithubReposViewModel,
     modifier: Modifier = Modifier,
 ) {
     val state: RepoState by viewModel.state.collectAsState()
-
     val scaffoldState = rememberScaffoldState()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
@@ -131,10 +135,10 @@ private fun RepoList(
 ) {
     Log.d(TAG, "RepoState: $state")
     when (state) {
-        RepoState.InitState -> Unit
-        RepoState.LoadingState -> ShowLoading()
-        is RepoState.ErrorState -> ShowError(modifier, state, onRetry)
-        is RepoState.ReadyState -> {
+        RepoState.Init -> Unit
+        RepoState.Loading -> ShowLoading()
+        is RepoState.Error -> ShowError(modifier, state, onRetry)
+        is RepoState.Ready -> {
             if (state.repos.isEmpty()) {
                 ShowNoResults(modifier)
             } else {
@@ -161,7 +165,7 @@ private fun ShowNoResults(modifier: Modifier) {
 @Composable
 private fun ShowError(
     modifier: Modifier,
-    state: RepoState.ErrorState,
+    state: RepoState.Error,
     onRetry: () -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -218,17 +222,14 @@ private fun ShowLoading() {
 @Composable
 private fun ShowResults(
     modifier: Modifier,
-    state: RepoState.ReadyState,
+    state: RepoState.Ready,
     onRepoSelected: (uri: Uri, context: Context) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.padding(
-            start = Theme.dimens.spacingStandard,
-            end = Theme.dimens.spacingStandard
-        ),
+        modifier = modifier,
         contentPadding = PaddingValues(
             horizontal = Theme.dimens.spacingSmall,
             vertical = Theme.dimens.spacingTiny
@@ -292,17 +293,18 @@ private fun ListItem(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    LloydsTechTestTheme {
-//        GithubBrowser(
-//            state = RepoState.InitState,
-//            controller = object : RepoController {
-//                override fun searchRepos(search: String) = Unit
-//                override fun openRepo(uri: Uri) = Unit
-//                override fun retrySearch() = Unit
-//            }
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    LloydsTechTestTheme {
+        GithubBrowserScreen(
+            viewModel = object : GithubReposViewModel {
+                override val state: StateFlow<RepoState>
+                    get() = MutableStateFlow<RepoState>(RepoState.Init)
+                override fun openRepo(uri: Uri, context: Context) = Unit
+                override fun searchRepos(search: String) = Unit
+                override fun retrySearch() = Unit
+            }
+        )
+    }
+}
