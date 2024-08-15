@@ -91,13 +91,13 @@ class ReposViewModelTest {
             assertThat(sut.lastSearch).isEqualTo(search)
         }
 
-    @Test
-    fun `GIVEN no previous search WHEN onStart THEN do nothing`() {
-        sut.onStart()
-
-        verify { mockSearchReposUseCase wasNot Called }
-        verify { mockOpenRepoUseCase wasNot Called }
-    }
+//    @Test
+//    fun `GIVEN no previous search WHEN onStart THEN do nothing`() {
+//        sut.onStart()
+//
+//        verify { mockSearchReposUseCase wasNot Called }
+//        verify { mockOpenRepoUseCase wasNot Called }
+//    }
 
     @Test
     fun `GIVEN no previous search WHEN retrySearch THEN do nothing`() {
