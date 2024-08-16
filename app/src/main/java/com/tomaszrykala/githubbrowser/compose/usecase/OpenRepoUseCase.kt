@@ -11,5 +11,5 @@ class OpenRepoUseCase @Inject constructor(
 ) {
 
     @MainThread
-    fun execute(uri: Uri, context: Context) = tabsLauncher.launch(uri, context)
+    operator fun invoke(uri: Uri, context: Context) = tabsLauncher.launch(uri, context)
 }

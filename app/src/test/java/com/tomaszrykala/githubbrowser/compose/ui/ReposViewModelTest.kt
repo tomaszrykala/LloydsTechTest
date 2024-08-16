@@ -29,15 +29,9 @@ class ReposViewModelTest {
 
     private val mockSearchReposUseCase: SearchReposUseCase = mockkR()
     private val mockOpenRepoUseCase: OpenRepoUseCase = mockkR()
-//    private val testScope = TestScope()
     private val search = "google"
 
-    private val sut = ReposViewModel(
-//        testScope,
-//        testScope,
-        mockSearchReposUseCase,
-        mockOpenRepoUseCase
-    )
+    private val sut = ReposViewModel(mockSearchReposUseCase, mockOpenRepoUseCase)
 
     @Test
     fun `GIVEN empty ReadyState is returned WHEN search THEN return it`() = runTest {
@@ -95,14 +89,6 @@ class ReposViewModelTest {
             assertThat(sut.lastSearch).isEqualTo(search)
         }
 
-//    @Test
-//    fun `GIVEN no previous search WHEN onStart THEN do nothing`() {
-//        sut.onStart()
-//
-//        verify { mockSearchReposUseCase wasNot Called }
-//        verify { mockOpenRepoUseCase wasNot Called }
-//    }
-
     @Test
     fun `GIVEN no previous search WHEN retrySearch THEN do nothing`() {
         sut.retrySearch()
@@ -118,6 +104,6 @@ class ReposViewModelTest {
 
         sut.openRepo(mockUri, mockContext)
 
-        verify { mockOpenRepoUseCase.execute(mockUri, mockContext) }
+        verify { mockOpenRepoUseCase(mockUri, mockContext) }
     }
 }

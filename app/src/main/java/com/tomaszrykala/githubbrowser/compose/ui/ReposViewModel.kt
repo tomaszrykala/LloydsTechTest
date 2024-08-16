@@ -41,21 +41,19 @@ class ReposViewModel @Inject constructor(
     }
 
     override fun openRepo(uri: Uri, context: Context) {
-        openRepoUseCase.execute(uri, context)
+        openRepoUseCase(uri, context)
     }
 
     private fun search(search: String) {
-        viewModelScope.launch {
-            _state.value = RepoState.Loading
-            withContext(Dispatchers.IO) {
-                searchReposUseCase(search).getOrElse {
-                    RepoState.Error(listOf(it.message ?: "Unknown error."))
-                }.let { state ->
-                    withContext(Dispatchers.Main) {
-                        _state.value = state
-                        if (state !is RepoState.Error) {
-                            lastSearch = null
-                        }
+        _state.value = RepoState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            searchReposUseCase(search).getOrElse {
+                RepoState.Error(listOf(it.message ?: "Unknown error."))
+            }.let { state ->
+                withContext(Dispatchers.Main) {
+                    _state.value = state
+                    if (state !is RepoState.Error) {
+                        lastSearch = null
                     }
                 }
             }

@@ -11,14 +11,14 @@ class OpenRepoUseCaseTest {
 
     private val mockTabsLauncher: CustomTabsLauncher = mockkR()
 
-    private val sut = OpenRepoUseCase(mockTabsLauncher)
+    private val useCase = OpenRepoUseCase(mockTabsLauncher)
 
     @Test
     fun `WHEN execute THEN open in TabsLauncher`() {
         val mockUri = mockkR<Uri>()
         val mockContext = mockkR<Context>()
 
-        sut.execute(mockUri, mockContext)
+        useCase(mockUri, mockContext)
 
         verify { mockTabsLauncher.launch(mockUri, mockContext) }
     }

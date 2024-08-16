@@ -57,7 +57,7 @@ import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as The
 
 @Composable
 fun GithubBrowserScreen(
-    viewModel: GithubReposViewModel,
+    viewModel: GithubReposViewModel, // = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val state: RepoState by viewModel.state.collectAsState()
@@ -301,6 +301,7 @@ fun DefaultPreview() {
             viewModel = object : GithubReposViewModel {
                 override val state: StateFlow<RepoState>
                     get() = MutableStateFlow<RepoState>(RepoState.Init)
+
                 override fun openRepo(uri: Uri, context: Context) = Unit
                 override fun searchRepos(search: String) = Unit
                 override fun retrySearch() = Unit
