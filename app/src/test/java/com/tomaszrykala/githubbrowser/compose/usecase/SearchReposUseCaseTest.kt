@@ -21,15 +21,15 @@ class SearchReposUseCaseTest {
     private val mockSearch: FindQuery.Search = mockkR()
     private val search = "search"
 
-    private val sut = SearchReposUseCase(mockRepoRepository)
+    private val useCase = SearchReposUseCase(mockRepoRepository)
 
     @Test
     fun `GIVEN initial sub WHEN execute THEN return success InitState`() = runTest {
         every { mockRepoRepository.queryFlow(search) } returns flow { }
 
-        val result = sut.execute(search)
+        val result = useCase(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.InitState))
+        assertThat(result).isEqualTo(Result.success(RepoState.Init))
     }
 
     @Test
@@ -45,9 +45,9 @@ class SearchReposUseCaseTest {
             emit(RepoResultDto.Success(mockData))
         }
 
-        val result = sut.execute(search)
+        val result = useCase(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.ReadyState(listOf(repo))))
+        assertThat(result).isEqualTo(Result.success(RepoState.Ready(listOf(repo))))
     }
 
     @Test
@@ -57,14 +57,14 @@ class SearchReposUseCaseTest {
             emit(RepoResultDto.Error(errors))
         }
 
-        val result = sut.execute(search)
+        val result = useCase(search)
 
-        assertThat(result).isEqualTo(Result.success(RepoState.ErrorState(errors)))
+        assertThat(result).isEqualTo(Result.success(RepoState.Error(errors)))
     }
 
     @Test
     fun `GIVEN data is null WHEN mapSuccess THEN return empty list`() {
-        val list = sut.mapSuccess(null)
+        val list = useCase.mapSuccess(null)
 
         assertThat(list).isEmpty()
     }
@@ -72,7 +72,7 @@ class SearchReposUseCaseTest {
     @Test
     fun `GIVEN nodes is null WHEN mapSuccess THEN return empty list`() {
         every { mockData.search } returns mockSearch
-        val list = sut.mapSuccess(mockData)
+        val list = useCase.mapSuccess(mockData)
 
         assertThat(list).isEmpty()
     }
@@ -81,7 +81,7 @@ class SearchReposUseCaseTest {
     fun `GIVEN nodes is empty WHEN mapSuccess THEN return empty list`() {
         every { mockData.search } returns mockSearch
         every { mockSearch.nodes } returns emptyList()
-        val list = sut.mapSuccess(mockData)
+        val list = useCase.mapSuccess(mockData)
 
         assertThat(list).isEmpty()
     }
@@ -90,7 +90,7 @@ class SearchReposUseCaseTest {
     fun `GIVEN nodes is a list of nulls WHEN mapSuccess THEN return empty list`() {
         every { mockData.search } returns mockSearch
         every { mockSearch.nodes } returns listOf(null, null)
-        val list = sut.mapSuccess(mockData)
+        val list = useCase.mapSuccess(mockData)
 
         assertThat(list).isEmpty()
     }
@@ -111,7 +111,7 @@ class SearchReposUseCaseTest {
             null
         )
 
-        val list = sut.mapSuccess(mockData)
+        val list = useCase.mapSuccess(mockData)
 
         assertThat(list).hasSize(2)
         assertThat(list[0]).isEqualTo(
