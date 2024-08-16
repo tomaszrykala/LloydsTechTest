@@ -81,8 +81,6 @@ dependencies {
 
     // --- Dagger / Hilt ---
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    // implementation "androidx.hilt:hilt-navigation-compose:$hilt_version"
-    // https://developer.android.com/jetpack/androidx/releases/hilt
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
     // --- Test ---

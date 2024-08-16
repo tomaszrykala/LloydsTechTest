@@ -57,7 +57,7 @@ import com.tomaszrykala.githubbrowser.compose.ui.theme.GithubBrowserTheme as The
 
 @Composable
 fun GithubBrowserScreen(
-    viewModel: GithubReposViewModel, // = hiltViewModel(),
+    viewModel: GithubReposViewModel,
     modifier: Modifier = Modifier,
 ) {
     val state: RepoState by viewModel.state.collectAsState()
